@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+			    http://www.springframework.org/schema/beans/spring-beans.xsd
+			    http://www.springframework.org/schema/context
+			    http://www.springframework.org/schema/context/spring-context.xsd
+			    http://www.springframework.org/schema/aop
+			    http://www.springframework.org/schema/aop/spring-aop.xsd
+			    http://www.springframework.org/schema/tx
+			    http://www.springframework.org/schema/tx/spring-tx.xsd
+			    http://www.springframework.org/schema/mvc
+			    http://www.springframework.org/schema/mvc/spring-mvc.xsd
+			    http://www.springframework.org/schema/security
+			    http://www.springframework.org/schema/security/spring-security.xsd">
+
+
+    <!--释放静态资源-->
+    <security:http pattern="/login.jsp" security="none"/>
+    <security:http pattern="/failer.jsp" security="none"/>
+    <security:http pattern="/css/**" security="none"/>
+    <security:http pattern="/img/**" security="none"/>
+    <security:http pattern="/plugins/**" security="none"/>
+
+    <security:global-method-security jsr250-annotations="enabled"
+                                        pre-post-annotations="enabled"
+                                        secured-annotations="enabled"/>
+
+    <!--springsecurity主配置-->
+    <security:http auto-config="true" use-expressions="true">
+        <!--配置基本角色和超级管理员角色-->
+        <security:intercept-url pattern="/**" access="hasAnyRole('ROLE_ADMIN','ROLE_USER')"/>
+        <!--配置认证-->
+        <security:form-login login-page="/login.jsp"
+                             login-processing-url="/login"
+                             default-target-url="/index.jsp"
+                             authentication-failure-url="/failer.jsp"/>
+        <!--退出认证配置-->
+        <security:logout invalidate-session="true"
+                         logout-url="/logout"
+                         logout-success-url="/login.jsp"/>
+        <!--关闭csrf拦截-->
+        <security:csrf disabled="true"/>
+        <!-- 处理403异常 -->
+        <security:access-denied-handler error-page="/403.jsp"/>
+    </security:http>
+    <bean id="encoder"
+          class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder">
+
+    </bean>
+
+</beans>
